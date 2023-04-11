@@ -1,10 +1,10 @@
---CREATE TABLE EmployeeDemographics
---(EmployeeID int, 
---FirstName varchar(50),
---LastName varchar(50),
---Age int,
---Gender varchar(50)
---)
+CREATE TABLE EmployeeDemographics
+(EmployeeID int, 
+FirstName varchar(50),
+LastName varchar(50),
+Age int,
+Gender varchar(50)
+)
 INSERT into EmployeeDemographics VALUES
 (1001, 'Kirthika', 'KS', 23, 'Female'),
 (1002, 'Pam', 'Beasley', 30, 'Female'),
