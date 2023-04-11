@@ -1,7 +1,7 @@
---CREATE TABLE EmployeeSalary(
---EmployeeID int,
---JobTitle varchar(50),
---Salary int)
+CREATE TABLE EmployeeSalary(
+EmployeeID int,
+JobTitle varchar(50),
+Salary int)
 
 INSERT into EmployeeSalary VALUES
 ('1001', 'Data Scientist', '100000'),
