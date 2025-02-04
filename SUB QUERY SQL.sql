@@ -210,4 +210,99 @@ WHERE TOTAL_SALES > (SELECT AVG(TOTAL_SALES) FROM SALES);
 
 ---- USING SUBQUERY IN SELECT - (NOT RECOMMENDED BUT GOOD TO KNOW)
 
+--- fetch all the employee details and add remarks to those
+--- employees who earn more than the average pay
 
+---- when you write a sub query in select it must return only one column , if not you will get error
+
+select* , (case when salary > (select avg(salary) from employee)
+            then 'Higher than average'
+			 else null
+			 end) as remarks
+from employee;
+
+
+-- you can also write the above query as follows
+
+select* , (case when salary > avg_sal.sal
+            then 'Higher than average'
+			 else null
+			 end) as remarks
+from employee
+cross join (select avg(salary) sal from employee) avg_sal;
+
+
+----HAVING 
+---- find the stores that has sold more units than avg units sold by all the stores
+
+select store_name, sum(quantity)
+from sales
+group by store_name
+having sum(quantity) > (select avg(quantity) from sales);
+
+
+CREATE TABLE employee_history
+(
+    emp_id      INT PRIMARY KEY,
+    emp_name    VARCHAR(50) NOT NULL,
+    dept_name   VARCHAR(50),
+    salary      INT,
+    location    VARCHAR(100),
+    constraint fk_emp_hist_01 foreign key(dept_name) references department1(dept_name),
+    constraint fk_emp_hist_02 foreign key(emp_id) references employee1(emp_id)
+);
+
+
+
+
+---- All the SQL COMMANDS that allow sub queries
+
+-- INSERT
+-- UPDATE
+-- DELETE
+
+--- INSERT 
+--- insert data to employee history table. make sure not to insert duplicate records
+
+-- we are taking data from other tables by taking data from dept and employee tables
+
+insert into employee_history
+select e.emp_id,e.emp_name,d.dept_name,e.salary,d.location
+from employee1 e
+join department1 d on d.dept_name = e.dept_name
+where not exists (select 1
+				   from employee_history eh
+				   where eh.emp_id = e.emp_id);
+
+select * from employee_history;
+
+-- the where condiotion only inserts records that does not exists in the table , to avoid duplicates
+
+--- UPDATE
+-- Give 10% increment to all the employees in the bangalore location
+--- based on the max salary earned by an emp in each dept
+-- only consider employess in employee_history table
+
+update employee1 e
+set salary = (select max(salary) + (max(salary) * 0.1)
+			   from employee_history eh
+			   where eh.dept_name = e.dept_name)
+
+where e.dept_name in (select dept_name
+					   from department1 
+					   where location = 'Bangalore')
+
+and e.emp_id in (select emp_id 
+				 from employee_history) ;
+
+-- update is outer query and the set part is subquery
+
+--- DELETE
+--- Delete all departments who do not have any emplpyees
+
+delete from department1
+where dept_name in (select dept_name
+					from department1 d
+					where not exists (select 1 
+				  						from employee1 e 
+				  						 where e.dept_name = d.dept_name));
